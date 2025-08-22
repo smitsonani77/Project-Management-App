@@ -3,6 +3,7 @@ import { useAuth } from "@/context/AuthContext";
 import { api } from "@/utils/api";
 import { useState } from "react";
 import type { Task } from "@/app/tasks/page";
+import { useToast } from "@/context/ToastContext";
 
 export default function TaskForm({
   onCreated
@@ -14,6 +15,7 @@ export default function TaskForm({
   const [description, setDescription] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const { addToast } = useToast();
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,6 +31,7 @@ export default function TaskForm({
       onCreated(task);
       setTitle("");
       setDescription("");
+      addToast("Task added successfully!", "success");
     } catch (err: any) {
       setError(err?.response?.data?.error || "Failed to create task");
     } finally {

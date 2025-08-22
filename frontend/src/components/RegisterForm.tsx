@@ -1,5 +1,6 @@
 "use client";
 import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/context/ToastContext";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -12,12 +13,15 @@ export default function RegisterForm() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const { addToast } = useToast();
+  
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       setLoading(true);
       setError(null);
       await register(username, email, password);
+      addToast("Signup successful!", "success");
       router.replace("/tasks");
     } catch (err: any) {
       setError(err?.response?.data?.error || "Registration failed");
