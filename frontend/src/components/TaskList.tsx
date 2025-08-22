@@ -65,34 +65,36 @@ export default function TaskList({
   };
 
   return (
-    <div className="space-y-4">
-      <h2 className="text-xl font-semibold">Task List</h2>
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold text-gray-800">📋 Task List</h2>
 
       {tasks.length === 0 ? (
-        <p className="text-sm text-gray-600">No tasks yet. Add one above.</p>
+        <p className="text-sm text-gray-600 italic">
+          No tasks yet. Add one above ✨
+        </p>
       ) : (
-        <ul className="divide-y">
+        <ul className="grid gap-4">
           {tasks.map((t) => (
             <li
               key={t.id}
-              className="py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2"
+              className="bg-white shadow-sm hover:shadow-md transition rounded-xl border p-4"
             >
               {editId === t.id ? (
                 // ✏️ Edit Mode
-                <div className="flex-1 flex flex-col gap-2">
+                <div className="flex flex-col gap-3">
                   <input
                     type="text"
-                    className="border rounded px-2 py-1"
+                    className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400 focus:outline-none"
                     value={editTitle}
                     onChange={(e) => setEditTitle(e.target.value)}
                   />
                   <textarea
-                    className="border rounded px-2 py-1"
+                    className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400 focus:outline-none"
                     value={editDescription}
                     onChange={(e) => setEditDescription(e.target.value)}
                   />
                   <select
-                    className="border rounded px-2 py-1"
+                    className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400 focus:outline-none"
                     value={editStatus}
                     onChange={(e) =>
                       setEditStatus(e.target.value as Task["status"])
@@ -104,30 +106,33 @@ export default function TaskList({
                       </option>
                     ))}
                   </select>
+
                   <div className="flex gap-2">
                     <button
                       onClick={() => saveEdit(t)}
-                      className="px-3 py-1 bg-blue-600 text-white rounded"
+                      className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition disabled:opacity-50"
                       disabled={busyId === t.id}
                     >
-                      Save
+                      💾 Save
                     </button>
                     <button
                       onClick={() => setEditId(null)}
-                      className="px-3 py-1 bg-gray-300 rounded"
+                      className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition"
                     >
-                      Cancel
+                      ✖ Cancel
                     </button>
                   </div>
                 </div>
               ) : (
                 // 👀 View Mode
-                <>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                   <div>
-                    <div className="flex items-center gap-2">
-                      <p className="text-xl font-medium">{t.title}</p>
+                    <div className="flex items-center gap-2 mb-1">
+                      <p className="text-lg font-semibold text-gray-900">
+                        {t.title}
+                      </p>
                       <span
-                        className={`text-xs px-2 py-1 rounded-full border ${getStatusClasses(
+                        className={`text-xs px-3 py-1 rounded-full border font-medium ${getStatusClasses(
                           t.status
                         )}`}
                       >
@@ -141,12 +146,12 @@ export default function TaskList({
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => startEdit(t)}
-                      className="px-3 py-1 bg-yellow-500 text-white rounded"
+                      className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition"
                     >
-                      Edit
+                      ✏️ Edit
                     </button>
                   </div>
-                </>
+                </div>
               )}
             </li>
           ))}

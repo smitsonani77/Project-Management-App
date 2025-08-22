@@ -5,6 +5,7 @@ import { useAuth } from "@/context/AuthContext";
 import TaskForm from "@/components/TaskForm";
 import TaskList from "@/components/TaskList";
 import { api } from "@/utils/api";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 export type Task = {
   id: number;
@@ -32,7 +33,7 @@ export default function TasksPage() {
       try {
         setLoading(true);
         const res = await api.get("/tasks", token);
-        console.log('res->',res)
+        console.log("res->", res);
         setTasks(res.tasks ?? res.data?.tasks ?? []);
         setError(null);
       } catch (e: any) {
@@ -49,23 +50,24 @@ export default function TasksPage() {
     setTasks((prev) => prev.map((t) => (t.id === updated.id ? updated : t)));
 
   if (!isAuthenticated) return null;
-
   return (
-    <div className="space-y-6">
-      <div className="card">
-        <h1 className="text-2xl font-semibold mb-4">Your Tasks</h1>
-        <TaskForm onCreated={addTask} />
-      </div>
+    <ProtectedRoute>
+      <div className="space-y-6">
+        <div className="card">
+          <h1 className="text-2xl font-semibold mb-4">Your Tasks</h1>
+          <TaskForm onCreated={addTask} />
+        </div>
 
-      <div className="card">
-        {loading ? (
-          <p>Loading...</p>
-        ) : error ? (
-          <p className="text-red-600">{error}</p>
-        ) : (
-          <TaskList tasks={tasks} onUpdated={updateTask} />
-        )}
+        <div className="card">
+          {loading ? (
+            <p>Loading...</p>
+          ) : error ? (
+            <p className="text-red-600">{error}</p>
+          ) : (
+            <TaskList tasks={tasks} onUpdated={updateTask} />
+          )}
+        </div>
       </div>
-    </div>
+    </ProtectedRoute>
   );
 }
