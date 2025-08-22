@@ -1,26 +1,19 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const { User } = require('../models');
-const { Op } = require('sequelize');
 
 const router = express.Router();
 
-// Register
 router.post('/register', async (req, res) => {
   try {
     const { username, email, password } = req.body;
 
-    // Check if user exists
-    const existingUser = await User.findOne({ 
-      where: { 
-        [Op.or]: [{ email }, { username }]
-      } 
-    });
+    const existingUser = await User.findOne({ where: { email } });
 
     if (existingUser) {
       return res.status(400).json({
         success: false,
-        message: 'User already exists'
+        message: 'Email already registered'
       });
     }
 
@@ -55,7 +48,6 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// Login
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;

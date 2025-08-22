@@ -4,7 +4,6 @@ const auth = require('../middleware/auth');
 
 const router = express.Router();
 
-// Get all tasks for authenticated user
 router.get('/tasks', auth, async (req, res) => {
   try {
     const tasks = await Task.findAll({
@@ -24,7 +23,6 @@ router.get('/tasks', auth, async (req, res) => {
   }
 });
 
-// Create new task
 router.post('/tasks', auth, async (req, res) => {
   try {
     const { title, description, status } = req.body;
@@ -50,7 +48,6 @@ router.post('/tasks', auth, async (req, res) => {
   }
 });
 
-// Update task
 router.put('/tasks/:id', auth, async (req, res) => {
   try {
     const { id } = req.params;
@@ -82,7 +79,6 @@ router.put('/tasks/:id', auth, async (req, res) => {
   }
 });
 
-// Delete task
 router.delete('/tasks/:id', auth, async (req, res) => {
   try {
     const { id } = req.params;
