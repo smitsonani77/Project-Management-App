@@ -11,7 +11,7 @@ export default function Navbar() {
       <div className="container flex items-center justify-between py-4">
         {/* Left: Logo */}
         <Link href="/" className="text-xl font-bold text-gray-800">
-          Project Manager
+          Project Management
         </Link>
 
         {/* Right: Nav links */}
