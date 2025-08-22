@@ -13,19 +13,50 @@ export default function TaskList({
   tasks: Task[];
   onUpdated: (t: Task) => void;
 }) {
-  const { token, logout } = useAuth();
+  const { token } = useAuth();
   const [busyId, setBusyId] = useState<number | null>(null);
+  const [editId, setEditId] = useState<number | null>(null);
+  const [editTitle, setEditTitle] = useState("");
+  const [editDescription, setEditDescription] = useState("");
+  const [editStatus, setEditStatus] = useState<Task["status"]>("pending");
 
-  const updateStatus = async (task: Task, status: Task["status"]) => {
+  const startEdit = (task: Task) => {
+    setEditId(task.id);
+    setEditTitle(task.title);
+    setEditDescription(task.description || "");
+    setEditStatus(task.status);
+  };
+
+  const getStatusClasses = (status: Task["status"]) => {
+    switch (status) {
+      case "pending":
+        return "bg-yellow-100 text-yellow-800 border-yellow-300";
+      case "in-progress":
+        return "bg-blue-100 text-blue-800 border-blue-300";
+      case "completed":
+        return "bg-green-100 text-green-800 border-green-300";
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-300";
+    }
+  };
+
+  const saveEdit = async (task: Task) => {
     try {
       setBusyId(task.id);
       const res = await api.put(
         `/tasks/${task.id}`,
-        { status },
+        { title: editTitle, description: editDescription, status: editStatus },
         token || undefined
       );
-      const updated: Task = res.task ?? res.data?.task ?? { ...task, status };
+      const updated: Task = res.task ??
+        res.data?.task ?? {
+          ...task,
+          title: editTitle,
+          description: editDescription,
+          status: editStatus
+        };
       onUpdated(updated);
+      setEditId(null);
     } catch (e: any) {
       alert(e?.response?.data?.error || "Failed to update");
     } finally {
@@ -35,12 +66,8 @@ export default function TaskList({
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold">Task List</h2>
-        <button className="btn btn-secondary" onClick={logout}>
-          Logout
-        </button>
-      </div>
+      <h2 className="text-xl font-semibold">Task List</h2>
+
       {tasks.length === 0 ? (
         <p className="text-sm text-gray-600">No tasks yet. Add one above.</p>
       ) : (
@@ -50,31 +77,77 @@ export default function TaskList({
               key={t.id}
               className="py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2"
             >
-              <div>
-                <p className="font-medium">{t.title}</p>
-                {t.description && (
-                  <p className="text-sm text-gray-600">{t.description}</p>
-                )}
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs px-2 py-1 rounded-full border">
-                  {t.status}
-                </span>
-                <select
-                  className="input max-w-xs"
-                  value={t.status}
-                  onChange={(e) =>
-                    updateStatus(t, e.target.value as Task["status"])
-                  }
-                  disabled={busyId === t.id}
-                >
-                  {statuses.map((s) => (
-                    <option key={s} value={s}>
-                      {s}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              {editId === t.id ? (
+                // ✏️ Edit Mode
+                <div className="flex-1 flex flex-col gap-2">
+                  <input
+                    type="text"
+                    className="border rounded px-2 py-1"
+                    value={editTitle}
+                    onChange={(e) => setEditTitle(e.target.value)}
+                  />
+                  <textarea
+                    className="border rounded px-2 py-1"
+                    value={editDescription}
+                    onChange={(e) => setEditDescription(e.target.value)}
+                  />
+                  <select
+                    className="border rounded px-2 py-1"
+                    value={editStatus}
+                    onChange={(e) =>
+                      setEditStatus(e.target.value as Task["status"])
+                    }
+                  >
+                    {statuses.map((s) => (
+                      <option key={s} value={s}>
+                        {s}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => saveEdit(t)}
+                      className="px-3 py-1 bg-blue-600 text-white rounded"
+                      disabled={busyId === t.id}
+                    >
+                      Save
+                    </button>
+                    <button
+                      onClick={() => setEditId(null)}
+                      className="px-3 py-1 bg-gray-300 rounded"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                // 👀 View Mode
+                <>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <p className="text-xl font-medium">{t.title}</p>
+                      <span
+                        className={`text-xs px-2 py-1 rounded-full border ${getStatusClasses(
+                          t.status
+                        )}`}
+                      >
+                        {t.status}
+                      </span>
+                    </div>
+                    {t.description && (
+                      <p className="text-sm text-gray-600">{t.description}</p>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => startEdit(t)}
+                      className="px-3 py-1 bg-yellow-500 text-white rounded"
+                    >
+                      Edit
+                    </button>
+                  </div>
+                </>
+              )}
             </li>
           ))}
         </ul>
