@@ -39,7 +39,7 @@ router.post('/tasks', auth, async (req, res) => {
     res.status(201).json({
       success: true,
       message: 'Task created successfully',
-      data: { tasks: task }
+      data: { task: task }
     });
   } catch (error) {
     res.status(500).json({
